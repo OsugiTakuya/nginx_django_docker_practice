@@ -8,7 +8,7 @@ services:
       - ./nginx/uwsgi_params:/etc/nginx/uwsgi_params
       - ./src/static:/static
     ports:
-      - '80:80'
+      - '8000:80'
     depends_on:
       - django
   django:
@@ -16,9 +16,13 @@ services:
     container_name: django
     expose:
       - '8001'
+    ports:
+      - '8002:8002'
     volumes:
       - ./src:/code
-    command: uwsgi --socket :8001 --module mysite.wsgi
+    # command: >
+    #   bash -c "nohup jupyter-notebook & &&
+    #   uwsgi --socket :8001 --module mysite.wsgi"
     depends_on:
       - db
   db:
