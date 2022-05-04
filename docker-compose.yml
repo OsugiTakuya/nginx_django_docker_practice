@@ -16,13 +16,18 @@ services:
     container_name: django
     expose:
       - '8001'
-    ports:
-      - '8002:8002'
     volumes:
       - ./src:/code
-    # command: >
-    #   bash -c "nohup jupyter-notebook & &&
-    #   uwsgi --socket :8001 --module mysite.wsgi"
+    command: uwsgi --socket :8001 --module mysite.wsgi
+    depends_on:
+      - db
+  jupyter:
+    build: ./jupyter
+    container_name: jupyter
+    ports:
+      - "8002:8888"
+    volumes:
+      - ./jupyter:/notebook
     depends_on:
       - db
   db:
