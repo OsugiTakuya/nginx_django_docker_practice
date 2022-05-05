@@ -1,14 +1,14 @@
 version: '3.5'
 services:
   nginx:
-    image: nginx:latest
+    image: nginx:1.21.6
     container_name: nginx
     volumes:
       - ./nginx/conf:/etc/nginx/conf.d
       - ./nginx/uwsgi_params:/etc/nginx/uwsgi_params
       - ./src/static:/static
     ports:
-      - '8000:80'
+      - '9000:80'
     depends_on:
       - django
   django:
@@ -25,7 +25,7 @@ services:
     build: ./jupyter
     container_name: jupyter
     ports:
-      - "8002:8888"
+      - "9001:8888"
     volumes:
       - ./jupyter:/notebook
     depends_on:
@@ -35,19 +35,18 @@ services:
     container_name: db
     volumes:
       - ./db/dbdata:/var/lib/postgresql/data
+      - ./db/initdb:/docker-entrypoint-initdb.d
     expose:
       - '5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      # - POSTGRES_DB=test
   db-gui:
     image: sosedoff/pgweb:0.11.11
     container_name: db-gui
-    # command: -s --bind=0.0.0.0 --listen=8080 --url postgresql://hogehoge@db/testDB?sslmode=disable
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/postgres?sslmode=disable
+    # environment:
+    #   DATABASE_URL: postgres://<user>:<pass>@db:5432/<DBname>?sslmode=disable
     ports:
-      - "8003:8081"
+      - "9002:8081"
     depends_on:
       - db
