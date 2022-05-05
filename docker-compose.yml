@@ -31,13 +31,23 @@ services:
     depends_on:
       - db
   db:
-    image: postgres:latest
+    image: postgres:11.15
     container_name: db
     volumes:
       - ./db/dbdata:/var/lib/postgresql/data
     expose:
       - '5432'
     environment:
-      - POSTGRES_USER=hogehoge
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=testDB
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      # - POSTGRES_DB=test
+  db-gui:
+    image: sosedoff/pgweb:0.11.11
+    container_name: db-gui
+    # command: -s --bind=0.0.0.0 --listen=8080 --url postgresql://hogehoge@db/testDB?sslmode=disable
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/postgres?sslmode=disable
+    ports:
+      - "8003:8081"
+    depends_on:
+      - db
