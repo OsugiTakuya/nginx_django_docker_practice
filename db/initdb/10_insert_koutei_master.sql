@@ -1,3 +1,6 @@
+-- テーブル切り替え
+\c endoscope_soft_part
+
 INSERT INTO koutei_master
     (id, name)
 VALUES
