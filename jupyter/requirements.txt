@@ -1,2 +1,2 @@
-notebook
+notebook==6.4.8
 psycopg2==2.8.4
