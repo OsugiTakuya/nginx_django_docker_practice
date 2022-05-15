@@ -11,6 +11,9 @@ services:
       - '9000:80'
     depends_on:
       - django
+    networks:
+      - frontend
+      - backend
   django:
     build: ./django
     container_name: django
@@ -21,6 +24,8 @@ services:
     command: uwsgi --socket :8001 --module mysite.wsgi
     depends_on:
       - db
+    networks:
+      - backend
   jupyter:
     build: ./jupyter
     container_name: jupyter
@@ -32,6 +37,8 @@ services:
       - ./jupyter:/notebook
     depends_on:
       - db
+    networks:
+      - backend
   db:
     image: postgres:11.15
     container_name: db
@@ -43,6 +50,8 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    networks:
+      - backend
   db-gui:
     ##### pgweb #####
     # image: sosedoff/pgweb:0.11.11
@@ -55,11 +64,17 @@ services:
     ##### pgAdmin #####
     image: dpage/pgadmin4:6.8
     environment:
-      PGADMIN_DEFAULT_EMAIL: x@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: x
+      PGADMIN_DEFAULT_EMAIL: user@example.com
+      PGADMIN_DEFAULT_PASSWORD: password
     expose:
       - '80'
     ##### 共通設定 #####
     container_name: db-gui
     depends_on:
       - db
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
