@@ -44,13 +44,22 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   db-gui:
-    image: sosedoff/pgweb:0.11.11
-    container_name: db-gui
-    # environment:
-    #   DATABASE_URL: postgres://<user>:<pass>@db:5432/<DBname>?sslmode=disable
-    # ports:
-    #   - "9002:8081"
+    ##### pgweb #####
+    # image: sosedoff/pgweb:0.11.11
+    # # environment:
+    # #   DATABASE_URL: postgres://<user>:<pass>@db:5432/<DBname>?sslmode=disable
+    # # ports:
+    # #   - "9002:8081"
+    # expose:
+    #   - '8081'
+    ##### pgAdmin #####
+    image: dpage/pgadmin4:6.8
+    environment:
+      PGADMIN_DEFAULT_EMAIL: x@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: x
     expose:
-      - '8081'
+      - '80'
+    ##### 共通設定 #####
+    container_name: db-gui
     depends_on:
       - db
