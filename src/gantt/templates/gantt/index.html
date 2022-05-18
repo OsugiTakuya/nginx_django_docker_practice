@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'gantt/common.css' %}">
+    <script src="{% static 'gantt/common.js' %}"></script>
+  </head>
+
+  <body>
+    {% if message %}
+      <p id="test_id">{{message}}</p>
+    {% else %}
+      <p>No Message</p>
+    {% endif %}
+    <input type="button" value="メッセージが表示されている場合に書き換えてくれるすごいボタン" onclick="sample_btnclick();">
+  </body>
+</html>
+
