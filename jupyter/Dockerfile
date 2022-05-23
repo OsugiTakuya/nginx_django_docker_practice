@@ -1,12 +1,27 @@
-FROM python:3.8.3
+FROM centos:7
 
-# cron
-RUN apt-get update && apt-get install -y cron
+# cron, pythonに必要なもの
+RUN yum update -y && yum install -y \
+    cronie-noanacron \
+    gcc make \
+    bzip2-devel gdbm-devel libffi-devel \
+    libuuid-devel ncurses-devel openssl-devel readline-devel \
+    sqlite-devel xz-devel zlib-devel tk-devel \
+    wget \
+    postgresql-devel
+
+# python install
+WORKDIR /root
+RUN wget https://www.python.org/ftp/python/3.8.3/Python-3.8.3.tgz
+RUN tar xzvf Python-3.8.3.tgz
+WORKDIR /root/Python-3.8.3
+RUN ./configure --with-threads
+RUN make install
 
 # pip install
 WORKDIR /notebook
 COPY requirements.txt /notebook/
-RUN pip install -r requirements.txt
+RUN pip3.8 install --upgrade pip && pip3.8 install -r requirements.txt
 COPY . /notebook/
 
 # jupyter設定
@@ -26,9 +41,8 @@ RUN echo "c.NotebookApp.ip = '0.0.0.0'" >> ~/.jupyter/jupyter_notebook_config.py
     echo "c.NotebookApp.allow_origin = '*'" >> ~/.jupyter/jupyter_notebook_config.py
 
 # cron設定
-RUN echo '* * * * * root echo "cron executed!" >> /var/log/cron.log 2>&1' > /etc/cron.d/gurobi_server_cron
-# RUN echo '* */6 * * * root echo "cron executed!" >> /var/log/cron.log 2>&1' > /etc/cron.d/gurobi_server_cron
-RUN chmod 0644 /etc/cron.d/gurobi_server_cron
+RUN echo '* * * * * root echo "cron executed!" >> /var/log/cron.log 2>&1' > /etc/cron.d/gurobi_connect.cron
+RUN chmod 0644 /etc/cron.d/*
 
 # sh設定
 RUN cp /notebook/init.sh /init.sh
