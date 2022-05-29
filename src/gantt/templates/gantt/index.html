@@ -1,108 +1,156 @@
 {% load static %}
 
-<!-- 参考：https://github.com/dmr/jquery.ganttView -->
+<!-- 参考：https://github.com/ateliee/jquery.schedule -->
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-   "http://www.w3.org/TR/html4/strict.dtd">
-
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="{% static 'gantt/style.min.css' %}" />
 
-	<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-	<link rel="stylesheet" type="text/css" href="{% static 'gantt/jquery.ganttView.css' %}" />
-	<style type="text/css">
-		body {
-			font-family: tahoma, verdana, helvetica;
-			font-size: 0.8em;
-			padding: 10px;
-		}
-	</style>
-	<title>jQuery Gantt</title>
+	<title>Gantt Demo</title>
 </head>
+
 <body>
-
-	<div id="ganttChart"></div>
+	<div id="schedule"></div>
 	<br/><br/>
-	<div id="eventMessage"></div>
-
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
-	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
-	<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-	<script type="text/javascript" src="{% static 'gantt/jquery.ganttView.js' %}"></script>
+	<div id="logs" class="table-responsive"></div>
+	
+	<script
+        src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js" type="text/javascript" language="javascript"></script>
+	<script type="text/javascript" src="{% static 'gantt/jq.schedule.min.js' %}"></script>
 	<script type="text/javascript">
-		var ganttData = [
-			{
-				id: 1, name: "Feature 1", series: [
-					{ name: "Planned", start: new Date(2010,00,01), end: new Date(2010,00,03) },
-					{ name: "Actual", start: new Date(2010,00,02), end: new Date(2010,00,05), color: "#f0f0f0" }
-				]
-			},
-			{
-				id: 2, name: "Feature 2", series: [
-					{ name: "Planned", start: new Date(2010,00,05), end: new Date(2010,00,20) },
-					{ name: "Actual", start: new Date(2010,00,06), end: new Date(2010,00,17), color: "#f0f0f0" },
-					{ name: "Projected", start: new Date(2010,00,06), end: new Date(2010,00,17), color: "#e0e0e0" }
-				]
-			},
-			{
-				id: 3, name: "Feature 3", series: [
-					{ name: "Planned", start: new Date(2010,00,11), end: new Date(2010,01,03) },
-					{ name: "Actual", start: new Date(2010,00,15), end: new Date(2010,01,03), color: "#f0f0f0" }
-				]
-			},
-			{
-				id: 4, name: "Feature 4", series: [
-					{ name: "Planned", start: new Date(2010,01,01), end: new Date(2010,01,03) },
-					{ name: "Actual", start: new Date(2010,01,01), end: new Date(2010,01,05), color: "#f0f0f0" }
-				]
-			},
-			{
-				id: 5, name: "Feature 5", series: [
-					{ name: "Planned", start: new Date(2010,02,01), end: new Date(2010,03,20) },
-					{ name: "Actual", start: new Date(2010,02,01), end: new Date(2010,03,26), color: "#f0f0f0" }
-				]
-			},
-			{
-				id: 6, name: "Feature 6", series: [
-					{ name: "Planned", start: new Date(2010,00,05), end: new Date(2010,00,20) },
-					{ name: "Actual", start: new Date(2010,00,06), end: new Date(2010,00,17), color: "#f0f0f0" },
-					{ name: "Projected", start: new Date(2010,00,06), end: new Date(2010,00,20), color: "#e0e0e0" }
-				]
-			},
-			{
-				id: 7, name: "Feature 7", series: [
-					{ name: "Planned", start: new Date(2010,00,11), end: new Date(2010,01,03) }
-				]
-			},
-			{
-				id: 8, name: "Feature 8", series: [
-					{ name: "Planned", start: new Date(2010,01,01), end: new Date(2010,01,03) },
-					{ name: "Actual", start: new Date(2010,01,01), end: new Date(2010,01,05), color: "#f0f0f0" }
-				]
-			}
-		];
-
-		$(function () {
-			$("#ganttChart").ganttView({
-				data: ganttData,
-				slideWidth: 900,
-				behavior: {
-					onClick: function (data) {
-						var msg = "You clicked on an event: { start: " + data.start.toString("M/d/yyyy") + ", end: " + data.end.toString("M/d/yyyy") + " }";
-						$("#eventMessage").text(msg);
+		function addLog(type, message){
+			var $log = $('<tr />');
+			$log.append($('<th />').text(type));
+			$log.append($('<td />').text(message ? JSON.stringify(message) : ''));
+			$("#logs table").prepend($log);
+		}
+		$(function(){
+			$("#logs").append('<table class="table">');
+			var isDraggable = true;
+			var isResizable = true;
+			var $sc = $("#schedule").timeSchedule({
+				startTime: "07:00", // schedule start time(HH:ii)
+				endTime: "21:00",   // schedule end time(HH:ii)
+				widthTime: 60 * 10,  // cell timestamp example 10 minutes
+				timeLineY: 60,       // height(px)
+				verticalScrollbar: 20,   // scrollbar (px)
+				timeLineBorder: 2,   // border(top and bottom)
+				bundleMoveWidth: 6,  // width to move all schedules to the right of the clicked time line cell
+				draggable: isDraggable,
+				resizable: isResizable,
+				resizableLeft: true,
+				rows : {
+					'0' : {
+						title : 'Title Area1',
+						schedule:[
+							{
+								start: '09:00',
+								end: '12:00',
+								text: 'Text Area',
+								data: {
+								}
+							},
+							{
+								start: '11:00',
+								end: '14:00',
+								text: 'Text Area',
+								data: {
+								}
+							}
+						]
 					},
-					onResize: function (data) {
-						var msg = "You resized an event: { start: " + data.start.toString("M/d/yyyy") + ", end: " + data.end.toString("M/d/yyyy") + " }";
-						$("#eventMessage").text(msg);
-					},
-					onDrag: function (data) {
-						var msg = "You dragged an event: { start: " + data.start.toString("M/d/yyyy") + ", end: " + data.end.toString("M/d/yyyy") + " }";
-						$("#eventMessage").text(msg);
+					'1' : {
+						title : 'Title Area2',
+						schedule:[
+							{
+								start: '16:00',
+								end: '17:00',
+								text: 'Text Area',
+								data: {
+								}
+							}
+						]
 					}
-				}
+				},
+				onChange: function(node, data){
+					addLog('onChange', data);
+				},
+				onInitRow: function(node, data){
+					addLog('onInitRow', data);
+				},
+				onClick: function(node, data){
+					addLog('onClick', data);
+				},
+				onAppendRow: function(node, data){
+					addLog('onAppendRow', data);
+				},
+				onAppendSchedule: function(node, data){
+					addLog('onAppendSchedule', data);
+					if(data.data.class){
+						node.addClass(data.data.class);
+					}
+					if(data.data.image){
+						var $img = $('<div class="photo"><img></div>');
+						$img.find('img').attr('src', data.data.image);
+						node.prepend($img);
+						node.addClass('sc_bar_photo');
+					}
+				},
+				onScheduleClick: function(node, time, timeline){
+					var start = time;
+					var end = $(this).timeSchedule('formatTime', $(this).timeSchedule('calcStringTime', time) + 3600);
+					$(this).timeSchedule('addSchedule', timeline, {
+						start: start,
+						end: end,
+						text:'Insert Schedule',
+						data:{
+							class: 'sc_bar_insert'
+						}
+					});
+					addLog('onScheduleClick', time + ' ' + timeline);
+				},
 			});
-
-			// $("#ganttChart").ganttView("setSlideWidth", 600);
+			$('#event_timelineData').on('click', function(){
+				addLog('timelineData', $sc.timeSchedule('timelineData'));
+			});
+			$('#event_scheduleData').on('click', function(){
+				addLog('scheduleData', $sc.timeSchedule('scheduleData'));
+			});
+			$('#event_resetData').on('click', function(){
+				$sc.timeSchedule('resetData');
+				addLog('resetData');
+			});
+			$('#event_resetRowData').on('click', function(){
+				$sc.timeSchedule('resetRowData');
+				addLog('resetRowData');
+			});
+			$('#event_setDraggable').on('click', function(){
+				isDraggable = !isDraggable;
+				$sc.timeSchedule('setDraggable', isDraggable);
+				addLog('setDraggable', isDraggable ? 'enable' : 'disable');
+			});
+			$('#event_setResizable').on('click', function(){
+				isResizable = !isResizable;
+				$sc.timeSchedule('setResizable', isResizable);
+				addLog('setResizable', isResizable ? 'enable' : 'disable');
+			});
+			$('.ajax-data').on('click', function(){
+				$.ajax({url: './data/'+$(this).attr('data-target')})
+					.done( (data) => {
+						addLog('Ajax GetData', data);
+						$sc.timeSchedule('setRows', data);
+					});
+			});
+			$('#clear-logs').on('click', function(){
+				$('#logs .table').empty();
+			});
 		});
 	</script>
 
