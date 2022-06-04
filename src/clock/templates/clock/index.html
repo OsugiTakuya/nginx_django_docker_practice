@@ -1,0 +1,32 @@
+{% load static %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+
+	<title>clock</title>
+</head>
+
+<body>
+    <span id="text"></span>
+  
+    <script type="text/javascript">
+  
+        function getTime() {
+            var now = new Date();
+            var nowhour = now.getHours();
+            var nowminutes = now.getMinutes();
+            var nowseconds = now.getSeconds();
+        
+            var text = nowhour + "：" + nowminutes + "：" + nowseconds; 
+            return text
+        };
+
+        var time_text = getTime();
+        document.getElementById("text").innerHTML = time_text;
+    </script>
+
+</body>
+</html>

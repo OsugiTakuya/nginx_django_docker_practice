@@ -18,5 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('gantt/', include('gantt.urls')),
+    path('clock/', include('clock.urls')),
     path('admin/', admin.site.urls),
 ]

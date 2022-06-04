@@ -25,6 +25,11 @@
 	<br/><br/>
 	<div id="eventMessage"></div>
 
+	<p>時刻更新</p>
+	{% csrf_token %}
+	<input type="button" id="button1" value="butttton">
+	<div id="div1"></div>
+
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -104,6 +109,60 @@
 
 			// $("#ganttChart").ganttView("setSlideWidth", 600);
 		});
+
+		// Ajax準備
+		function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+		data_submit = {'disp_time': 1, 'any_data': 400};
+
+		// Ajaxで時刻表示
+		$('#button1').click(function(e){
+			$.ajax({
+				// url: "http://18.183.151.164:9000/clock/getnow",
+				url: '{% url "clock:getnow" %}',
+				type: "POST",
+				data: data_submit,
+				dataType: "json",
+				timeout: 1000,
+				cache: false,
+			})
+			.done(function(response){
+				$('#div1').text(response.now);
+			})
+			.fail(function(){
+				$('#div1').text('error!!!!');
+			});
+		});
+		
 	</script>
 
 </body>
